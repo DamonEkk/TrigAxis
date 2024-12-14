@@ -10,8 +10,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 
 public class MainController {
+    int[][] circleMatrix;
 
     @FXML
     private HBox mainHBox;
@@ -24,6 +27,10 @@ public class MainController {
 
     @FXML
     private StackPane mainCanvas;
+
+    @FXML
+    private Group circles;
+
 
     @FXML
     public void initialize(){
@@ -40,8 +47,6 @@ public class MainController {
 
     }
 
-    @FXML
-    private Label welcomeText;
 
     private void CreateNewCanvas(){
         Group root = new Group();
@@ -52,15 +57,27 @@ public class MainController {
         AxisSetup(gc);
         root.getChildren().add(canvas);
         mainCanvas.getChildren().add(root);
+
+        canvas.setOnMouseClicked(event -> {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
+            if (x >= 0 && y >= 0 && x < circleMatrix.length && y < circleMatrix[0].length && circleMatrix[x][y] == 1) {
+                gc.setFill(Color.BLUE);
+                gc.fillOval(x - 5, y - 5, 20, 20); // Highlight the circle
+            }
+        });
+
     }
 
     private void AxisSetup(GraphicsContext gc){
         gc.setLineWidth(1);
         gc.setFill(Color.BLACK);
+        int offset = 20;
+        int lineDistance = 30;
 
 
-        for (int i = 0; i < mainCanvas.getWidth(); i += 30){
-            if (i >= mainCanvas.getWidth()/2 - 20 && i <= mainCanvas.getWidth()/2 + 20){
+        for (int i = 0; i < mainCanvas.getWidth(); i += lineDistance){
+            if (i >= mainCanvas.getWidth()/2 - offset && i <= mainCanvas.getWidth()/2 + offset){
                 gc.setLineWidth(3);
                 gc.strokeLine(i, 0, i, mainCanvas.getHeight());
                 gc.setLineWidth(1);
@@ -70,8 +87,8 @@ public class MainController {
             }
         }
 
-        for (int i = 0; i < mainCanvas.getHeight(); i += 30){
-            if (i >= mainCanvas.getHeight()/2 - 20 && i <= mainCanvas.getHeight()/2 + 20){
+        for (int i = 0; i < mainCanvas.getHeight(); i += lineDistance){
+            if (i >= mainCanvas.getHeight()/2 - offset && i <= mainCanvas.getHeight()/2 + offset){
                 gc.setLineWidth(3);
                 gc.strokeLine(0, i, mainCanvas.getWidth(), i);
                 gc.setLineWidth(1);
@@ -80,6 +97,26 @@ public class MainController {
                 gc.strokeLine(0, i, mainCanvas.getWidth(), i);
             }
         }
+
+
+        gc.beginPath();
+        gc.setFill(Color.DARKRED);
+        circleMatrix = new int[(int) mainCanvas.getWidth()][(int) mainCanvas.getHeight()];
+
+        for (int i = -4; i < mainCanvas.getWidth(); i += lineDistance ){
+            for (int j = -4; j < mainCanvas.getHeight(); j += lineDistance){
+                gc.fillOval(i, j, 10, 10);
+                if (i > -1 && j > -1){
+                    circleMatrix[i][j] = 1;
+                }
+
+            }
+        }
+
+        gc.clip();
+
     }
+
+
 
 }
